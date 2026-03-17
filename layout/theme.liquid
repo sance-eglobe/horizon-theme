@@ -36,6 +36,24 @@
     {% endif %}
 
     {{ content_for_header }}
+
+    {% comment %} Storefront API token — store in theme settings or hardcode for dev {% endcomment %}
+    <script>
+      window.shopifyStorefrontToken = {{ settings.storefront_api_token | json }};
+
+      {% comment %}
+        B2B context: Shopify injects buyerIdentity automatically when a B2B customer
+        is logged in and their company location session is active.
+        storeAvailability in the Storefront API response is already scoped to the
+        company location's catalog — no extra filtering needed client-side.
+      {% endcomment %}
+      window.shopifyCustomerB2B = {{ customer.b2b? | json | default: 'false' }};
+      window.inventoryStrings = {
+        loading:     {{ 'general.loading' | json }},
+        noLocations: {{ 'products.inventory.no_locations' | json }},
+        error:       {{ 'products.inventory.error' | json }}
+      };
+    </script>
   </head>
 
   <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
