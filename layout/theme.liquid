@@ -39,8 +39,8 @@
 
     {% comment %} Storefront API token — store in theme settings or hardcode for dev {% endcomment %}
     <script>
-      window.shopifyStorefrontToken = {{ settings.storefront_api_token | json }};
-
+      {% comment %} window.shopifyStorefrontToken = {{ settings.storefront_api_token | json }}; {% endcomment %}
+      window.shopifyStorefrontToken = "f7272bbeaed3c57b01046de9c786bd52";
       {% comment %}
         B2B context: Shopify injects buyerIdentity automatically when a B2B customer
         is logged in and their company location session is active.
