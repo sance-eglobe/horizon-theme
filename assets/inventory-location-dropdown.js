@@ -76,14 +76,19 @@ async function fetchInventory(variantId) {
     body: JSON.stringify(buildQuery(variantId)),
   });
 
+  console.log("response", res);
+
   if (!res.ok) throw new Error(`Storefront API error: ${res.status}`);
 
   const { data, errors } = await res.json();
+
+  console.log("data", data);
+
   if (errors?.length) throw new Error(errors[0].message);
 
   const variant = data?.node;
   if (!variant) return [];
-
+  console.log("variant", variant);
   const locations = variant.storeAvailability.edges.map(({ node }) => ({
     locationName: node.location.name,
     locationId: node.location.id,
