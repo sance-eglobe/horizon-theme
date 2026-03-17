@@ -181,6 +181,7 @@ function initDropdown(wrapper) {
           .then((locations) => renderLocations(listEl, locations))
           .catch(() => {
             listEl.innerHTML = `<li class="inventory-location-list__error">Could not load inventory.</li>`;
+            console.error("[inventory-dropdown]", err);
           });
       }
     });
