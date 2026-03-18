@@ -1,10 +1,16 @@
-
-
 {% capture cart_page_more_blocks_content %}
   <div class="cart-page__more-blocks">
     {%- content_for 'blocks' -%}
   </div>
 {% endcapture %}
+
+{{ 'b2b-cart-address-selector.css' | asset_url | stylesheet_tag }}
+
+<script
+  src="{{ 'b2b-cart-address-selector.js' | asset_url }}"
+  type="module"
+  defer="defer"
+></script>
 
 <cart-items-component
   class="cart-items-component"
@@ -47,6 +53,7 @@
         {%- content_for 'block', id: 'cart-page-items', type: '_cart-products' %}
       </div>
 
+      {% render 'b2b-cart-address-selector' %}
       {%- unless cart.empty? -%}
         <div class="cart-page__summary">
           {%- content_for 'block', id: 'cart-page-summary', type: '_cart-summary' -%}
