@@ -1,0 +1,244 @@
+/**
+ * FILE: assets/b2b-cart-address-selector.css
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Styles for the B2B ship-to address selector on the cart page.
+ * Uses CSS custom properties so you can override in your theme's settings.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* ── CSS Custom Properties (override in your theme) ─────────────────────── */
+:root {
+  --b2b-border-color: #e1e1e1;
+  --b2b-border-radius: 6px;
+  --b2b-bg: #f9f9f9;
+  --b2b-bg-hover: #f0f0f0;
+  --b2b-accent: #008060; /* Shopify green — swap as needed */
+  --b2b-accent-light: #e6f4f0;
+  --b2b-text: #202020;
+  --b2b-text-muted: #6d7175;
+  --b2b-error: #d72c0d;
+  --b2b-error-bg: #fff4f4;
+  --b2b-font-size-base: 0.875rem; /* 14px */
+  --b2b-font-size-sm: 0.75rem; /* 12px */
+  --b2b-spacing-xs: 4px;
+  --b2b-spacing-sm: 8px;
+  --b2b-spacing-md: 12px;
+  --b2b-spacing-lg: 16px;
+}
+
+/* ── Wrapper ─────────────────────────────────────────────────────────────── */
+.b2b-ship-to {
+  border: 1px solid var(--b2b-border-color);
+  border-radius: var(--b2b-border-radius);
+  background: var(--b2b-bg);
+  padding: var(--b2b-spacing-lg);
+  margin-block-end: var(--b2b-spacing-lg);
+  font-size: var(--b2b-font-size-base);
+  color: var(--b2b-text);
+}
+
+/* ── Header row (icon + label + select) ─────────────────────────────────── */
+.b2b-ship-to__header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--b2b-spacing-sm);
+}
+
+.b2b-ship-to__icon {
+  display: flex;
+  align-items: center;
+  color: var(--b2b-accent);
+  flex-shrink: 0;
+}
+
+.b2b-ship-to__label {
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Select wrapper ──────────────────────────────────────────────────────── */
+.b2b-ship-to__select-wrapper {
+  position: relative;
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.b2b-ship-to__select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  padding: var(--b2b-spacing-sm) calc(var(--b2b-spacing-lg) * 2)
+    var(--b2b-spacing-sm) var(--b2b-spacing-sm);
+  border: 1px solid var(--b2b-border-color);
+  border-radius: var(--b2b-border-radius);
+  background: #fff;
+  font-size: var(--b2b-font-size-base);
+  color: var(--b2b-text);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.b2b-ship-to__select:focus {
+  outline: none;
+  border-color: var(--b2b-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--b2b-accent) 25%, transparent);
+}
+
+.b2b-ship-to__select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.b2b-ship-to__chevron {
+  position: absolute;
+  right: var(--b2b-spacing-sm);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 1.1em;
+  color: var(--b2b-text-muted);
+}
+
+/* ── Address display ─────────────────────────────────────────────────────── */
+.b2b-ship-to__address {
+  margin-block-start: var(--b2b-spacing-md);
+  padding-block-start: var(--b2b-spacing-md);
+  border-block-start: 1px dashed var(--b2b-border-color);
+}
+
+.b2b-ship-to__address-text {
+  font-style: normal;
+  line-height: 1.6;
+  color: var(--b2b-text-muted);
+  font-size: var(--b2b-font-size-sm);
+}
+
+/* ── Status message ──────────────────────────────────────────────────────── */
+.b2b-ship-to__status {
+  margin-block-start: var(--b2b-spacing-sm);
+  font-size: var(--b2b-font-size-sm);
+  color: var(--b2b-accent);
+  min-height: 1.4em;
+}
+
+.b2b-ship-to__status--error {
+  color: var(--b2b-error);
+  background: var(--b2b-error-bg);
+  padding: var(--b2b-spacing-xs) var(--b2b-spacing-sm);
+  border-radius: var(--b2b-border-radius);
+}
+
+/* ── Shipping methods panel ──────────────────────────────────────────────── */
+.b2b-ship-to__methods {
+  margin-block-start: var(--b2b-spacing-lg);
+  padding-block-start: var(--b2b-spacing-lg);
+  border-block-start: 1px solid var(--b2b-border-color);
+}
+
+.b2b-ship-to__methods-label {
+  font-weight: 600;
+  margin-block-end: var(--b2b-spacing-sm);
+  font-size: var(--b2b-font-size-base);
+}
+
+.b2b-ship-to__methods-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--b2b-spacing-xs);
+}
+
+.b2b-ship-to__methods-none {
+  color: var(--b2b-text-muted);
+  font-size: var(--b2b-font-size-sm);
+  font-style: italic;
+}
+
+/* ── Individual method item ──────────────────────────────────────────────── */
+.b2b-ship-to__method-item {
+  border-radius: var(--b2b-border-radius);
+  overflow: hidden;
+}
+
+.b2b-ship-to__method-label {
+  display: flex;
+  align-items: center;
+  gap: var(--b2b-spacing-sm);
+  padding: var(--b2b-spacing-sm) var(--b2b-spacing-md);
+  border: 1px solid var(--b2b-border-color);
+  border-radius: var(--b2b-border-radius);
+  cursor: pointer;
+  transition:
+    background 0.1s ease,
+    border-color 0.1s ease;
+  background: #fff;
+}
+
+.b2b-ship-to__method-label:hover {
+  background: var(--b2b-bg-hover);
+}
+
+.b2b-ship-to__method-label--selected {
+  border-color: var(--b2b-accent);
+  background: var(--b2b-accent-light);
+}
+
+.b2b-ship-to__method-radio {
+  accent-color: var(--b2b-accent);
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.b2b-ship-to__method-icon {
+  font-size: 1.1em;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.b2b-ship-to__method-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.b2b-ship-to__method-title {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.b2b-ship-to__method-desc {
+  font-size: var(--b2b-font-size-sm);
+  color: var(--b2b-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.b2b-ship-to__method-cost {
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  padding-inline-start: var(--b2b-spacing-sm);
+}
+
+/* ── Responsive tweaks ───────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .b2b-ship-to__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .b2b-ship-to__select-wrapper {
+    width: 100%;
+  }
+}

@@ -360,6 +360,15 @@
       "check_locations": "Check availability"
     }
   },
+  "cart": {
+    "b2b": {
+      "ship_to_label": "Shipping destination",
+      "ship_to": "Ship to",
+      "select_location": "Select company location",
+      "shipping_method": "Shipping method",
+      "no_shipping_rates": "Shipping rates will be calculated at checkout."
+    }
+  },
   "general": {
     "loading": "Loading…"
   }
