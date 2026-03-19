@@ -6,7 +6,7 @@
   // These come from window.__b2b emitted by Liquid — no change needed there
   const { shopDomain, storefrontToken, locations, currentLocationId } =
     window.__b2b;
-  cartId = null; // We'll get this from the storefront API on init
+  let cartId = null; // We'll get this from the storefront API on init
 
   const select = document.getElementById("b2b-location-select");
   const addressDisplay = document.getElementById("b2b-address-display");
@@ -304,6 +304,47 @@
       console.error("[B2B]", err);
     }
   }
+
+  async function resolveCartId() {
+    // Step 1: Get the token from Shopify's AJAX Cart API
+    const res = await fetch("/cart.js");
+    const cart = await res.json();
+    const token = cart.token;
+
+    if (!token) {
+      console.warn("[B2B] Cart is empty, no token available yet.");
+      return null;
+    }
+
+    console.log("[B2B] Raw cart token from /cart.js:", token);
+
+    // Step 2: Try both known GID formats against the Storefront API
+    const candidates = [`gid://shopify/Cart/${token}`, `c1-${token}`];
+
+    for (const id of candidates) {
+      try {
+        const data = await storefrontFetch(
+          `
+        query CheckCart($id: ID!) {
+          cart(id: $id) { id }
+        }
+      `,
+          { id },
+        );
+
+        if (data?.cart?.id) {
+          console.log("[B2B] Resolved cart GID:", data.cart.id);
+          return data.cart.id;
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+
+    console.warn("[B2B] Could not match token to a Storefront API cart.");
+    return null;
+  }
+
   /* ── Init ────────────────────────────────────────────────────────────── */
   async function init() {
     try {
