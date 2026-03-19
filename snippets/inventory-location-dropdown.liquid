@@ -1,0 +1,69 @@
+{% comment %}
+  Snippet: inventory-location-dropdown.liquid
+  Usage (PLP card): {% render 'inventory-location-dropdown', product: card_product, context: 'plp' %}
+  Usage (PDP):      {% render 'inventory-location-dropdown', product: product, context: 'pdp' %}
+
+  Supports: B2B (company location catalogs) + B2C
+  Edge case: inventory_policy == 'continue' (tracking disabled) → shows "In stock" fallback
+{% endcomment %}
+
+{{ 'inventory-location-dropdown.css' | asset_url | stylesheet_tag }}
+<script
+  src="{{ 'inventory-location-dropdown.js' | asset_url }}"
+  type="module"
+  defer="defer"
+></script>
+
+{%- liquid
+  assign first_variant = product.selected_or_first_available_variant
+  assign tracking_enabled = false
+  for variant in product.variants
+    if variant.inventory_management == 'shopify'
+      assign tracking_enabled = true
+      break
+    endif
+  endfor
+-%}
+
+<div
+  class="inventory-location-dropdown"
+  data-product-id="{{ product.id }}"
+  data-variant-id="{{ first_variant.id }}"
+  data-context="{{ context }}"
+  data-tracking="{{ tracking_enabled }}"
+>
+  {%- if tracking_enabled == false -%}
+    {%- comment -%} Edge case: inventory tracking disabled for this product {%- endcomment -%}
+    <span class="inventory-badge inventory-badge--no-tracking">
+      {{ 'products.product.in_stock' | t | default: 'In stock' }}
+    </span>
+  {%- else -%}
+    <div class="inventory-location-trigger">
+      <button
+        class="inventory-location-btn"
+        aria-expanded="false"
+        aria-controls="inv-dropdown-{{ product.id }}"
+        data-inventory-toggle
+      >
+        <span class="inventory-location-btn__label">
+          {{- 'products.inventory.check_locations' | t | default: 'Check availability' -}}
+        </span>
+        {%- render 'icon-carret' -%}
+      </button>
+    </div>
+
+    <div
+      id="inv-dropdown-{{ product.id }}"
+      class="inventory-location-panel"
+      hidden
+      role="region"
+      aria-live="polite"
+    >
+      <ul class="inventory-location-list" data-inventory-list>
+        <li class="inventory-location-list__loading">
+          {{- 'general.loading' | t | default: 'Loading…' -}}
+        </li>
+      </ul>
+    </div>
+  {%- endif -%}
+</div>

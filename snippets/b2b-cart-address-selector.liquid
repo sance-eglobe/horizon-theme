@@ -1,0 +1,150 @@
+{%- comment -%}
+  ================================================================================
+    FILE: snippets/b2b-cart-address-selector.liquid
+    PURPOSE: Renders a ship-to address picker + shipping method selector on
+             the cart page for B2B customers. Uses the Storefront API via JS.
+    USAGE:   {% render 'b2b-cart-address-selector' %}
+             Place this inside your cart template / cart section, just above
+             or below the cart line items table.
+  ================================================================================
+{%- endcomment -%}
+
+{%- if customer.b2b? -%}
+  {%- comment -%}
+    ── DATA LAYER ──────────────────────────────────────────────────────────────
+    Emit all company location data as a JSON object so JS can read it without
+    extra API calls. Each location carries its shipping_address fields and the
+    `url_to_set_as_current` helper that Shopify provides for location switching.
+  {%- endcomment -%}
+
+  <script>
+    window.__b2b = {
+      shopDomain:    {{ shop.permanent_domain | json }},
+      storefrontToken: {{ shop.metafields.b2b.storefront_access_token | json }},
+      cartId:        {{ cart.token | prepend: 'gid://shopify/Cart/' | json }},
+      currentLocationId: {{ customer.current_location.id | json }},
+      locations: [
+        {%- paginate customer.company_available_locations by 100 -%}
+          {%- for loc in customer.company_available_locations -%}
+            {
+              id:          {{ loc.id | json }},
+              name:        {{ loc.name | json }},
+              isCurrent:   {{ loc.current? | json }},
+              urlToSet:    {{ loc.url_to_set_as_current | json }},
+              address: {
+                firstName:    {{ loc.shipping_address.first_name | json }},
+                lastName:     {{ loc.shipping_address.last_name | json }},
+                company:      {{ loc.name | json }},
+                address1:     {{ loc.shipping_address.address1 | json }},
+                address2:     {{ loc.shipping_address.address2 | default: '' | json }},
+                city:         {{ loc.shipping_address.city | json }},
+                provinceCode: {{ loc.shipping_address.province_code | json }},
+                zip:          {{ loc.shipping_address.zip | json }},
+                countryCode:  {{ loc.shipping_address.country_code | json }}
+              }
+            }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        {%- endpaginate -%}
+      ]
+    };
+  </script>
+
+  {%- comment -%} ── HTML SHELL ─────────────────────────────────────────────── {%- endcomment -%}
+
+  <div
+    id="b2b-ship-to"
+    class="b2b-ship-to"
+    aria-label="{{ 'cart.b2b.ship_to_label' | t | default: 'Shipping destination' }}"
+  >
+    {%- comment -%} ── LOCATION / ADDRESS SELECTOR ──────────────────────────── {%- endcomment -%}
+    <div class="b2b-ship-to__header">
+      <span class="b2b-ship-to__icon">
+        {%- comment -%} Inline SVG — swap for your theme icon if preferred {%- endcomment -%}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          aria-hidden="true"
+        >
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+          <circle cx="12" cy="9" r="2.5"/>
+        </svg>
+      </span>
+      <span class="b2b-ship-to__label">
+        {{ 'cart.b2b.ship_to' | t | default: 'Ship to' }}
+      </span>
+
+      <div class="b2b-ship-to__select-wrapper">
+        <select
+          id="b2b-location-select"
+          class="b2b-ship-to__select"
+          aria-label="{{ 'cart.b2b.select_location' | t | default: 'Select company location' }}"
+        >
+          {%- paginate customer.company_available_locations by 100 -%}
+            {%- for loc in customer.company_available_locations -%}
+              <option
+                value="{{ loc.id }}"
+                {%- if loc.current? %}
+                  selected
+                {%- endif -%}
+              >
+                {{ loc.name }}
+                {%- unless loc.shipping_address.city == blank -%}
+                  &nbsp;— {{ loc.shipping_address.city }}
+                  {%- unless loc.shipping_address.province_code == blank -%}
+                    , {{ loc.shipping_address.province_code }}
+                  {%- endunless -%}
+                {%- endunless -%}
+              </option>
+            {%- endfor -%}
+          {%- endpaginate -%}
+        </select>
+        <span class="b2b-ship-to__chevron" aria-hidden="true">&#8964;</span>
+      </div>
+    </div>
+
+    {%- comment -%} ── SELECTED ADDRESS DISPLAY ─────────────────────────────── {%- endcomment -%}
+    <div id="b2b-address-display" class="b2b-ship-to__address" aria-live="polite">
+      {%- assign cl = customer.current_location -%}
+      {%- if cl != blank and cl.shipping_address != blank -%}
+        <address class="b2b-ship-to__address-text">
+          {{- cl.name -}}
+          <br>
+          {{- cl.shipping_address.address1 -}}
+          {%- unless cl.shipping_address.address2 == blank -%}, {{ cl.shipping_address.address2 }}{%- endunless -%}
+          <br>
+          {{- cl.shipping_address.city -}}
+          , {{ cl.shipping_address.province_code }}
+          {{ cl.shipping_address.zip -}}
+          <br>
+          {{- cl.shipping_address.country -}}
+        </address>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ── STATUS / LOADING INDICATOR ───────────────────────────── {%- endcomment -%}
+    <div id="b2b-status" class="b2b-ship-to__status" aria-live="assertive" role="status" hidden></div>
+
+    {%- comment -%} ── SHIPPING METHOD SELECTOR ─────────────────────────────── {%- endcomment -%}
+    <div id="b2b-shipping-methods" class="b2b-ship-to__methods" hidden>
+      <p class="b2b-ship-to__methods-label">
+        {{ 'cart.b2b.shipping_method' | t | default: 'Shipping method' }}
+      </p>
+      <div
+        id="b2b-methods-list"
+        class="b2b-ship-to__methods-list"
+        role="radiogroup"
+        aria-label="{{ 'cart.b2b.shipping_method' | t | default: 'Shipping method' }}"
+      >
+        {%- comment -%} Populated dynamically by JS {%- endcomment -%}
+      </div>
+      <p id="b2b-methods-none" class="b2b-ship-to__methods-none" hidden>
+        {{ 'cart.b2b.no_shipping_rates' | t | default: 'Shipping rates will be calculated at checkout.' }}
+      </p>
+    </div>
+  </div>
+{%- endif -%}
