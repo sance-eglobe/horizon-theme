@@ -4,8 +4,9 @@
   const API_VERSION = "2025-01";
 
   // These come from window.__b2b emitted by Liquid — no change needed there
-  const { shopDomain, storefrontToken, locations, cartId, currentLocationId } =
+  const { shopDomain, storefrontToken, locations, currentLocationId } =
     window.__b2b;
+  cartId = null; // We'll get this from the storefront API on init
 
   const select = document.getElementById("b2b-location-select");
   const addressDisplay = document.getElementById("b2b-address-display");
@@ -269,13 +270,31 @@
   async function onLocationChange(e) {
     const loc = findLocation(e.target.value);
     if (!loc) return;
+
     try {
       setLoading(true);
-      await switchShopifyLocation(loc); // 1. switch session (no token)
-      await setDeliveryAddress(loc); // 2. set address on cart (no token)
-      renderAddressDisplay(loc); // 3. update UI
-      const groups = await fetchDeliveryGroups(); // 4. fetch rates (no token)
-      renderShippingMethods(groups); // 5. render rates
+
+      // 1. Switch Shopify session
+      await switchShopifyLocation(loc);
+
+      // 2. Always re-resolve cartId after location switch
+      cartId = await resolveCartId();
+
+      // 3. Reset so we use Add (not Replace) on fresh cart context
+      hasSetAddressBefore = false;
+
+      if (cartId) {
+        // 4. Set delivery address
+        await setDeliveryAddress(loc);
+
+        // 5. Fetch and render shipping methods
+        const groups = await fetchDeliveryGroups();
+        renderShippingMethods(groups);
+      }
+
+      // 6. Update address display
+      renderAddressDisplay(loc);
+
       setLoading(false);
       setStatus(`Shipping to ${loc.name}.`);
       setTimeout(() => setStatus(""), 4000);
@@ -285,11 +304,19 @@
       console.error("[B2B]", err);
     }
   }
-
   /* ── Init ────────────────────────────────────────────────────────────── */
   async function init() {
     try {
-      // Set address for current location on load
+      cartId = await resolveCartId();
+
+      if (!cartId) {
+        // Cart is empty — still wire up the dropdown for UX
+        // but skip API calls that need a cartId
+        renderAddressDisplay(findLocation(currentLocationId));
+        select.addEventListener("change", onLocationChange);
+        return;
+      }
+
       if (currentLocationId) {
         const loc = findLocation(currentLocationId);
         if (loc) {
@@ -297,10 +324,9 @@
           renderAddressDisplay(loc);
         }
       }
-      // Load shipping rates
+
       const groups = await fetchDeliveryGroups();
       renderShippingMethods(groups);
-      // Wire up dropdown
       select.addEventListener("change", onLocationChange);
     } catch (err) {
       setStatus("Shipping rates will be shown at checkout.", false);
