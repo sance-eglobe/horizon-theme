@@ -242,3 +242,199 @@
     width: 100%;
   }
 }
+
+/* ── Ship / Pickup mode toggle ───────────────────────────────────────────── */
+
+/* ── Ship / Pickup mode toggle ───────────────────────────────────────────── */
+.b2b-ship-to__mode-toggle {
+  display: flex;
+  gap: 6px;
+  margin-block-end: var(--b2b-spacing-lg);
+  background: var(--b2b-bg);
+  border: 1px solid var(--b2b-border-color);
+  border-radius: var(--b2b-border-radius);
+  padding: 4px;
+}
+
+.b2b-ship-to__mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: calc(var(--b2b-border-radius) - 2px);
+  background: transparent;
+  color: var(--b2b-text-muted);
+  font-size: var(--b2b-font-size-base);
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  font-weight: 500;
+}
+
+.b2b-ship-to__mode-btn:hover {
+  background: var(--b2b-bg-hover);
+  color: var(--b2b-text);
+}
+
+.b2b-ship-to__mode-btn--active {
+  background: #fff;
+  color: var(--b2b-accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.b2b-ship-to__mode-btn svg {
+  flex-shrink: 0;
+}
+
+/* ── Pickup panel ────────────────────────────────────────────────────────── */
+.b2b-ship-to__pickup-panel {
+  margin-block-start: var(--b2b-spacing-md);
+}
+
+.b2b-ship-to__pickup-count {
+  font-size: var(--b2b-font-size-sm);
+  color: var(--b2b-text-muted);
+  margin-block-end: var(--b2b-spacing-sm);
+}
+
+.b2b-ship-to__pickup-none {
+  font-size: var(--b2b-font-size-sm);
+  color: var(--b2b-text-muted);
+  font-style: italic;
+  padding: var(--b2b-spacing-md) 0;
+}
+
+.b2b-ship-to__pickup-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--b2b-spacing-xs);
+}
+
+/* ── Individual pickup location card ─────────────────────────────────────── */
+.b2b-ship-to__pickup-label {
+  display: flex;
+  align-items: center;
+  gap: var(--b2b-spacing-sm);
+  padding: var(--b2b-spacing-sm) var(--b2b-spacing-md);
+  border: 1px solid var(--b2b-border-color);
+  border-radius: var(--b2b-border-radius);
+  cursor: pointer;
+  background: #fff;
+  transition:
+    background 0.1s ease,
+    border-color 0.1s ease;
+}
+
+.b2b-ship-to__pickup-label:hover {
+  background: var(--b2b-bg-hover);
+}
+
+.b2b-ship-to__pickup-label--selected {
+  border-color: var(--b2b-accent);
+  background: var(--b2b-accent-light, #e6f4f0);
+}
+
+.b2b-ship-to__pickup-radio {
+  accent-color: var(--b2b-accent);
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.b2b-ship-to__pickup-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.b2b-ship-to__pickup-name {
+  font-size: var(--b2b-font-size-base);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.b2b-ship-to__pickup-addr {
+  font-size: var(--b2b-font-size-sm);
+  color: var(--b2b-text-muted);
+}
+
+.b2b-ship-to__pickup-time {
+  font-size: var(--b2b-font-size-sm);
+  color: var(--b2b-accent);
+  font-weight: 500;
+}
+
+.b2b-ship-to__pickup-badge {
+  font-size: var(--b2b-font-size-sm);
+  font-weight: 700;
+  color: var(--b2b-accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  padding-inline-start: var(--b2b-spacing-sm);
+}
+
+/* ── Pickup mode — hide ship UI via class (more reliable than hidden attr) ── */
+#b2b-ship-to.b2b-ship-to--pickup-mode .b2b-ship-to__header,
+#b2b-ship-to.b2b-ship-to--pickup-mode #b2b-address-display,
+#b2b-ship-to.b2b-ship-to--pickup-mode #b2b-shipping-methods {
+  display: none !important;
+}
+
+/* ── Stock availability indicators ───────────────────────────────────────── */
+.b2b-stock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-block-start: 4px;
+}
+
+.b2b-stock__row {
+  display: block;
+  font-size: var(--b2b-font-size-sm);
+}
+
+.b2b-stock__qty {
+  font-weight: 500;
+}
+
+.b2b-stock__qty--ok {
+  color: #0f6e56;
+}
+
+.b2b-stock__qty--low {
+  color: #854f0b;
+}
+
+.b2b-stock__qty--out {
+  color: #a32d2d;
+}
+
+/* ── Unavailable location card ───────────────────────────────────────────── */
+.b2b-ship-to__pickup-label--unavailable {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--b2b-bg);
+}
+
+.b2b-ship-to__pickup-badge--unavailable {
+  color: #a32d2d;
+  font-weight: 500;
+}
+
+.b2b-ship-to__pickup-unavail-heading {
+  font-size: var(--b2b-font-size-sm);
+  color: var(--b2b-text-muted);
+  margin-block: 10px 4px;
+  font-style: italic;
+}

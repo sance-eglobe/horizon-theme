@@ -21,7 +21,7 @@
     window.__b2b = {
       shopDomain:    {{ shop.permanent_domain | json }},
       storefrontToken: {{ shop.metafields.b2b.storefront_access_token | json }},
-      cartId:        {{ cart.token | prepend: 'gid://shopify/Cart/' | json }},
+      cartId:        null,
       currentLocationId: {{ customer.current_location.id | json }},
       locations: [
         {%- paginate customer.company_available_locations by 100 -%}
